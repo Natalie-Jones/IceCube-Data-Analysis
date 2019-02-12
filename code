@@ -1,0 +1,280 @@
+#__energies values for all four samples__
+
+data40 = np.loadtxt('IC 40 times&energies.txt', unpack = True)
+data59 = np.loadtxt('IC 59 times&energies.txt', unpack = True)
+data79 = np.loadtxt('IC 79 times&energies.txt', unpack = True)
+data86a = np.loadtxt('IC 86a times&energies.txt', unpack = True)
+data86b = np.loadtxt('IC 86b times&energies.txt', unpack = True)
+data86c = np.loadtxt('IC 86c times&energies.txt', unpack = True)
+
+######## log normal fit ########
+
+from scipy.stats import lognorm
+
+x = np.linspace(2,6,100)
+s = .5
+plt.figure(figsize=(20,10))
+
+#___40___
+plt.subplot(231)
+bincounts, binedges, ptchs = plt.hist(data40[4],30,range=[2.5,5.5],normed=1)
+bincenters = 0.5*(binedges[1:]+binedges[:-1])
+fitted_pdf = lognorm.pdf(x,s,loc=3,scale=.45)
+plt.title('Log Normal Fit to Sample 40')
+plt.xlabel("energy")
+plt.ylabel("bin count")
+plt.plot(x,fitted_pdf,'r-')
+#plt.show()
+
+#___59___
+plt.subplot(232)
+bincounts, binedges, ptchs = plt.hist(data59[4],30,range=[2.5,5.5],normed=1)
+bincenters = 0.5*(binedges[1:]+binedges[:-1])
+fitted_pdf = lognorm.pdf(x,s,loc=2.9,scale=.5)
+plt.title('Log Normal Fit to Sample 59')
+plt.xlabel("energy")
+plt.ylabel("bin count")
+plt.plot(x,fitted_pdf,'r-')
+#plt.show()
+
+#___79___
+plt.subplot(233)
+bincounts, binedges, ptchs = plt.hist(data79[4],50,range=[2.5,5.5],normed=1)
+bincenters = 0.5*(binedges[1:]+binedges[:-1])
+fitted_pdf = lognorm.pdf(x,s,loc=3.05,scale=.375)
+
+plt.title('Log Normal Fit to Sample 79')
+plt.xlabel("energy")
+plt.ylabel("bin count")
+plt.plot(x,fitted_pdf,'r-')
+#plt.show()
+
+#___86a___
+plt.subplot(234)
+bincounts, binedges, ptchs = plt.hist(data86a[4],40,range=[2.5,5.5],normed=1)
+bincenters = 0.5*(binedges[1:]+binedges[:-1])
+fitted_pdf = lognorm.pdf(x,s,loc=2.6,scale=.4)
+
+plt.title('Log Normal Fit to Sample 86a')
+plt.xlabel("energy")
+plt.ylabel("bin count")
+plt.plot(x,fitted_pdf,'r-')
+#plt.show()
+
+#___86b___
+plt.subplot(235)
+bincounts, binedges, ptchs = plt.hist(data86b[4],40,range=[2.5,5.5],normed=1)
+bincenters = 0.5*(binedges[1:]+binedges[:-1])
+fitted_pdf = lognorm.pdf(x,s,loc=2.65,scale=.4)
+plt.title('Log Normal Fit to Sample 86b')
+plt.xlabel("energy")
+plt.ylabel("bin count")
+plt.plot(x,fitted_pdf,'r-')
+#plt.show()
+
+#___86c___
+plt.subplot(236)
+bincounts, binedges, ptchs = plt.hist(data86c[4],40,range=[2.5,5.5],normed=1)
+bincenters = 0.5*(binedges[1:]+binedges[:-1])
+fitted_pdf = lognorm.pdf(x,s,loc=2.56,scale=.4)
+plt.title('Log Normal Fit to Sample 86c')
+plt.xlabel("energy")
+plt.ylabel("bin count")
+plt.plot(x,fitted_pdf,'r-')
+
+plt.tight_layout()
+plt.show()
+
+
+#### log normal likelihood function:
+
+def likelihood(data,n,mu,var):
+    n = len(data)
+    return -(n/2)*sp.log(2*sp.pi*var)-(1/(2*var))*((data-mu)**2)
+    
+    ######## Means ########
+
+###calculate the partial derivative:
+mu = symbols('mu', real=True)
+
+partial_mu40 = diff(likelihood(data40[4],len(data40[4]),mu,var), mu)
+partial_mu59 = diff(likelihood(data59[4],len(data59[4]),mu,var), mu)
+partial_mu79 = diff(likelihood(data79[4],len(data79[4]),mu,var), mu)
+partial_mu86a = diff(likelihood(data86a[4],len(data86a[4]),mu,var), mu)
+partial_mu86b = diff(likelihood(data86b[4],len(data86b[4]),mu,var), mu)
+partial_mu86c = diff(likelihood(data86c[4],len(data86c[4]),mu,var), mu)
+
+
+###sum the arrays:
+
+sum_mu40 = np.sum(partial_mu40)
+sum_mu59 = np.sum(partial_mu59)
+sum_mu79 = np.sum(partial_mu79)
+sum_mu86a = np.sum(partial_mu86a)
+sum_mu86b = np.sum(partial_mu86b)
+sum_mu86c = np.sum(partial_mu86c)
+
+###set the sums = 0, solve for mu:
+
+mu = Symbol('mu')
+
+mean40 = solve(sum_mu40)[0]
+print("mean IC 40:")
+print("MLE:",mean40)
+print("Numpy:",np.mean(data40[4]))    #check
+
+print()    #spacing
+
+mean59 = solve(sum_mu59)[0]
+print("mean IC 59:")
+print("MLE:",mean59)
+print("Numpy:",np.mean(data59[4]))    #check
+
+print()    #spacing
+
+mean79 = solve(sum_mu79)[0]
+print("mean IC 79:")
+print("MLE:",mean79)
+print("Numpy:",np.mean(data79[4]))    #check
+
+print()    #spacing
+
+mean86a = solve(sum_mu86a)[0]
+print("mean IC 86a:")
+print("MLE:",mean86a)
+print("Numpy:",np.mean(data86a[4]))    #check
+
+print()    #spacing
+
+mean86b = solve(sum_mu86b)[0]
+print("mean IC 86b:")
+print("MLE:",mean86b)
+print("Numpy:",np.mean(data86b[4]))    #check
+
+print()    #spacing
+
+mean86c = solve(sum_mu86c)[0]
+print("mean IC 86c:")
+print("MLE:",mean86c)
+print("Numpy:",np.mean(data86c[4]))    #check
+
+
+
+######## Variances ########
+
+###calculate the partial derivative:
+var = symbols('var', real=True)
+
+partial_var40 = diff(likelihood(data40[4],len(data40[4]),3.64935483870968,var), var)
+partial_var59 = diff(likelihood(data59[4],len(data59[4]),3.47357798165138,var), var)
+partial_var79 = diff(likelihood(data79[4],len(data79[4]),3.44979381443299,var), var)
+partial_var86a = diff(likelihood(data86a[4],len(data86a[4]),3.08330275229358,var), var)
+
+###sum the arrays:
+
+sum_var40 = np.sum(partial_var40)
+sum_var59 = np.sum(partial_var59)
+sum_var79 = np.sum(partial_var79)
+sum_var86a = np.sum(partial_var86a)
+sum_var86b = np.sum(partial_var86b)
+sum_var86c = np.sum(partial_var86c)
+
+###set the sums = 0, solve for var:
+
+var = Symbol('var')
+
+variance40 = solve(sum_var40)[0]*len(data40[4])
+print("variance IC40:")
+print("MLE:",variance40)
+print("Numpy:",np.std(data40[4])**2)
+
+print()
+
+variance59 = solve(sum_var59)[0]*len(data59[4])
+print("variance IC59:")
+print("MLE:",variance59)
+print("Numpy:",np.std(data59[4])**2)
+
+print()
+
+variance79 = solve(sum_var79)[0]*len(data79[4])
+print("variance IC79:")
+print("MLE:",variance79)
+print("Numpy:",np.std(data79[4])**2)
+
+print()
+
+variance86a = solve(sum_var86a)[0]*len(data86a[4])
+print("variance IC86a:")
+print("MLE:",variance86a)
+print("Numpy:",np.std(data86a[4])**2)
+
+print()
+
+variance86b = solve(sum_var86b)[0]*len(data86b[4])
+print("variance IC86b:")
+print("MLE:",variance86b)
+print("Numpy:",np.std(data86b[4])**2)
+
+print()
+
+variance86c = solve(sum_var86c)[0]*len(data86c[4])
+print("variance IC86c:")
+print("MLE:",variance86c)
+print("Numpy:",np.std(data86c[4])**2)
+partial_var86b = diff(likelihood(data86b[4],len(data86b[4]),3.06378125000000,var), var)
+partial_var86c = diff(likelihood(data86c[4],len(data86c[4]),2.96729272419628,var), var)
+
+
+### variance in null model, taken from partial derivative, 
+#which I don't think is the right way to get the variance    
+
+def nullvar(data):
+    return sum(data)/len(data)
+    
+
+##### Test statistic and p-values ######
+
+sum40 = sum(data40[4])
+sum59 = sum(data59[4])
+sum79 = sum(data79[4])
+sum86a = sum(data86a[4])
+sum86b = sum(data86b[4])
+sum86c = sum(data86c[4])
+
+
+###40
+null = -(len(data40[4])/2)*sp.log(2*3.1415926535*nullvar(data40[4]))-(1/(2*nullvar(data40[4])))*(sum40**2)
+alt = -(len(data40[4])/2)*sp.log(2*3.1415926535*variance40)-(1/(2*variance40))*((sum40-mean40)**2)
+ts40 = -2*sp.log(null/alt)
+p40 = chi2.pdf(5.16067375522455,1)
+
+###59
+null = -(len(data59[4])/2)*sp.log(2*3.1415926535*nullvar(data59[4]))-(1/(2*nullvar(data59[4])))*((sum59)**2)
+alt = -(len(data59[4])/2)*sp.log(2*3.1415926535*variance59)-(1/(2*variance59))*((sum59-mean59)**2)
+ts59 = -2*sp.log(null/alt)
+p59 = chi2.pdf(7.22743010897479,1)
+
+###79
+null = -(len(data79[4])/2)*sp.log(2*3.1415926535*nullvar(data79[4]))-(1/(2*nullvar(data79[4])))*((sum79)**2)
+alt = -(len(data59[4])/2)*sp.log(2*3.1415926535*variance79)-(1/(2*variance79))*((sum79-mean79)**2)
+ts79 = -2*sp.log(null/alt)
+p79 = chi2.pdf(7.40221491788422,1)
+
+###86a
+null = -(len(data86a[4])/2)*sp.log(2*3.1415926535*nullvar(data86a[4]))-(1/(2*nullvar(data86a[4])))*((sum86a)**2)
+alt = -(len(data86a[4])/2)*sp.log(2*3.1415926535*variance86a)-(1/(2*variance86a))*((sum86a-mean86a)**2)
+ts86a = -2*sp.log(null/alt)
+p86a = chi2.pdf(7.50302054988395,1)
+
+###86b
+null = -(len(data86b[4])/2)*sp.log(2*3.1415926535*nullvar(data86b[4]))-(1/(2*nullvar(data86b[4])))*((sum86b)**2)
+alt = -(len(data86b[4])/2)*sp.log(2*3.1415926535*variance86b)-(1/(2*variance86b))*((sum86b-mean86b)**2)
+ts86b = -2*sp.log(null/alt)
+p86b = chi2.pdf(7.09899687511462,1)
+
+###86c
+null = -(len(data86c[4])/2)*sp.log(2*3.1415926535*nullvar(data86c[4]))-(1/(2*nullvar(data86c[4])))*((sum86c)**2)
+alt = -(len(data86c[4])/2)*sp.log(2*3.1415926535*variance86c)-(1/(2*variance86c))*((sum86c-mean86c)**2)
+ts86c = -2*sp.log(null/alt)
+p86c = chi2.pdf(7.50654850745732,1)
